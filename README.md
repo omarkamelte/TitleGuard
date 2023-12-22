@@ -12,3 +12,46 @@ The chosen solution leverages Google tools, which offer a suite of interconnecte
 On the backend, the form is linked to a Google Sheet that captures the responses. This sheet is connected to a script featuring a function named 'onFormSubmit,' triggered automatically upon form submission. This function constructs an email using the inserted information and conducts a search for similarity against a predefined list of titles stored in another Google Sheet labeled 'all Titles.' Notably, this sheet also acts as the response destination for another Google Form designed to accept new titles. This ensures a consistent update of existing titles, maintaining a comprehensive record.
 
 Upon receiving the email, the researcher can make informed decisions, either proceeding with the proposed title or exploring alternative options. The relevant script and supporting methods can be found in the mentioned repository, contributing to the fulfillment of the primary request."
+
+### TitleGuard Script
+
+#### Overview:
+
+The `onFormSubmit` function is triggered by a Google Form submission. It extracts submitted titles and user information, then checks the similarity of the titles against existing titles in both Arabic and English. The results are emailed to the researcher.
+
+#### Functions:
+
+1. **onFormSubmit(e):**
+   - Triggers on form submission.
+   - Retrieves submitted data and calculates title similarity.
+   - Composes an email with the results and sends it to the researcher.
+
+2. **calculateSimilarities(submittedText, titles, arabic=false):**
+   - Calculates similarity scores for each title.
+   - Filters and sorts results based on similarity percentage and title length.
+   - Returns a formatted table of similarities.
+
+3. **calculateSimilarity(textA, textB):**
+   - Calculates the percentage similarity between two strings.
+
+4. **simi(str1, str2, LevenshteinDistance):**
+   - Compares two strings for similarity.
+   - Returns a value between 0 and 100 representing the percentage of similarity.
+
+5. **Wsimi(w1, w2, lev):**
+   - Checks if two words are exactly equal or have Levenshtein distance less than or equal to 2.
+
+6. **LevenshteinDistance(s1, s2):**
+   - Calculates the Levenshtein distance between two strings.
+
+#### Usage:
+
+1. The `onFormSubmit` function is triggered automatically upon Google Form submission.
+2. Results are emailed to the researcher, displaying the similarity percentages in a formatted table.
+3. Researchers can decide whether to proceed with the proposed title or choose another.
+
+#### Note:
+
+- Replace `'ADD YOUR SPREADSHEET ID'` with the actual ID of the spreadsheet containing titles.
+
+#### Powered by: Omar Kamel, MSc
