@@ -100,3 +100,31 @@ You can call the `simi` function in Excel directly and pass the cells directly, 
 Feel free to integrate this code into your projects for efficient string similarity calculations.
 
 #### Powered by: Omar Kamel, MSc
+
+# Data Cleansing for Multilingual Data
+
+Data cleansing is a crucial step in any data processing workflow. In scenarios where data is provided in both Arabic and English within consecutive cells, organizing the information into distinct Arabic and English columns becomes essential. Each title should be paired with its corresponding Arabic version.
+
+To address this requirement, a VBA Macro has been employed to execute this transformation.
+
+### VBA Macro for Multilingual Data Arrangement
+
+This VBA Macro seamlessly organizes multilingual data by aligning Arabic and English titles into separate columns. The process ensures that each title is positioned alongside its corresponding Arabic version, providing a more structured and accessible dataset.
+
+- VBA Macro for Dividing and Arranging Arabic and English Columns
+
+This VBA Macro facilitates the division and arrangement of data in Arabic and English columns within an Excel worksheet. The main functionalities include:
+
+- **DivideArabicEnglishColumns** Macro
+This macro takes an input range and separates the Arabic and English text, placing them in designated columns on a specified worksheet ("All_Titles"). It checks each cell in the input range, identifies the language based on the character range, and arranges the data accordingly.
+
+- **IsArabicText** Function
+A helper function is used within the macro to determine if a given text contains Arabic characters. It checks the Unicode range of each character in the text.
+
+- **TestDivideArabicEnglishColumns** Function
+This macro serves as a testing interface, prompting the user to select a range. It then calls the DivideArabicEnglishColumns macro to perform the division and arrangement.
+
+Feel free to utilize this VBA Macro in your data processing tasks to enhance the organization and clarity of multilingual datasets.
+
+#### Powered by: Omar Kamel, MSc
+
