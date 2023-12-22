@@ -1,0 +1,98 @@
+Public Function simi(str1 As String, str2 As String, LevenshteinDistance As Boolean) As Double
+' Compares two words for similarity.
+    ' Returns True if the words are exactly equal, or if their Levenshtein distance is less than or equal to 10% of the length of the longer word.
+    '
+    ' Parameters:
+    '   w1: The first word.
+    '   w2: The second word.
+    
+    ' Check if the words are exactly equal (case-insensitive)
+    Dim words1() As String
+    Dim words2() As String
+    Dim commonWords As Integer
+    Dim totalWords As Integer
+    
+    ' Split the input strings into arrays of words
+    words1 = Split(str1, " ")
+    words2 = Split(str2, " ")
+    
+    ' Initialize counters
+    commonWords = 0
+    totalWords = UBound(words2) + 1
+    
+    ' Compare each word in words2 with words1
+    For i = LBound(words2) To UBound(words2)
+        For j = LBound(words1) To UBound(words1)
+            If Wsimi(UCase(words2(i)), UCase(words1(j)), LevenshteinDistance) Then
+            'If UCase(words2(i)) = UCase(words1(j)) Then
+                commonWords = commonWords + 1
+                Exit For ' Exit the inner loop when a match is found
+            End If
+        Next j
+    Next i
+    
+    ' Calculate the percentage of similarity
+    If totalWords > 0 Then
+        simi = commonWords / totalWords
+    Else
+        simi = 0
+    End If
+End Function
+
+Public Function Wsimi(w1 As String, w2 As String, lev As Boolean) As Boolean
+    If StrComp(w1, w2, vbTextCompare) = 0 Then
+        Wsimi = True  ' Words are exactly equal
+        Exit Function
+    Else
+        If lev = True Then
+            ' Calculate Levenshtein distance
+            Wsimi = (LevenshteinDistance(w1, w2) <= 2)
+            Exit Function
+        End If
+    End If
+    Wsimi = False
+End Function
+
+
+Private Function LevenshteinDistance(s1 As String, s2 As String) As Integer
+    Dim len1 As Integer
+    Dim len2 As Integer
+    Dim i As Integer
+    Dim j As Integer
+    Dim cost As Integer
+    Dim d() As Integer
+    
+    len1 = Len(s1)
+    len2 = Len(s2)
+    
+    ReDim d(0 To len1, 0 To len2)
+    
+    For i = 0 To len1
+        d(i, 0) = i
+    Next i
+    
+    For j = 0 To len2
+        d(0, j) = j
+    Next j
+    
+    For i = 1 To len1
+        For j = 1 To len2
+            If Mid(s1, i, 1) = Mid(s2, j, 1) Then
+                cost = 0
+            Else
+                cost = 1
+            End If
+            
+            d(i, j) = Application.WorksheetFunction.Min( _
+                d(i - 1, j) + 1, _
+                d(i, j - 1) + 1, _
+                d(i - 1, j - 1) + cost _
+            )
+        Next j
+    Next i
+    
+    LevenshteinDistance = d(len1, len2)
+End Function
+
+
+
