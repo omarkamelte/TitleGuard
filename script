@@ -1,0 +1,186 @@
+function onFormSubmit(e) {
+
+  // Get the submitted values
+  var submittedEText = e.values[2]; // Assuming the text "e" is in the second column
+  var submittedAText = e.values[3]; // Assuming the text "a" is in the second column
+  var submittedSalut = e.values[4]; // Assuming the text "a" is in the second column
+  var submittedName = e.values[5]; // Assuming the text "a" is in the second column
+
+  // Fetch the list of titles from the "Titles" sheet
+  // Open the "Titles" spreadsheet by ID
+  var titlesSpreadsheetId = 'ADD YOUR SPREADSHEET ID';
+  var titleSpreadsheet = SpreadsheetApp.openById(titlesSpreadsheetId);
+
+  // Get the "Titles" sheet from the other spreadsheet
+  var titleSheet = titleSpreadsheet.getSheetByName('Titles');
+  var atitleRange = titleSheet.getRange('C:C'); // Assuming titles are in column A,B
+  var etitleRange = titleSheet.getRange('D:D'); // Assuming titles are in column A,B
+  var atitleValues = atitleRange.getValues().flat();
+  var etitleValues = etitleRange.getValues().flat();
+
+  // Calculate similarity with each title
+  var similaritiesA = calculateSimilarities(submittedAText, atitleValues,true);
+  var similaritiesE = calculateSimilarities(submittedEText, etitleValues);
+
+
+  // Send an email to the user with similarity list
+  var recipientEmail = e.values[1]; // Assuming the user's email is in the first column
+  var subject = 'Similarity Result';
+  
+  // Assuming submittedSalut, submittedName, submittedAText, submittedEText, similaritiesA, and similaritiesE are defined
+
+var body = `Dear ${submittedSalut} ${submittedName},
+
+Greetings,
+
+You recently conducted a search for the following titles in the Computers and Information Collage Database to assess the similarity between your proposed titles and those already in existence.
+
+The titles you provided are as follows:
+
+[[ ${submittedAText} ]]
+
+[[ ${submittedEText} ]]
+
+Below are the results of your comparison:
+
+Arabic Similarity List:
+
+${similaritiesA}
+
+English Similarity List:
+
+${similaritiesE}
+
+Thank you for utilizing our portal.
+
+Best regards,
+[your organization]
+                                         
+                                         
+                                   Powered by:Omar Kamel,msc`;
+
+
+  MailApp.sendEmail(recipientEmail, subject, body);
+
+  
+}
+
+
+function calculateSimilarities(submittedText, titles, arabic=false) {
+  // Calculate similarity scores with each title
+  var similarities = titles.map(function (title) {
+    //var similarity = calculateSimilarity(submittedText, title);
+    var similarity = simi(submittedText, title,true);
+    return {
+      title: title,
+      similarity: similarity.toFixed(2)
+    };
+  });
+
+  // Filter and sort the results
+  var filteredSimilarities = similarities.filter(function (item) {
+    return item.similarity > 50 && item.title.length>10;
+  });
+
+  filteredSimilarities.sort(function (a, b) {
+    return b.similarity - a.similarity;
+  });
+
+  if (filteredSimilarities.length==0){
+    return 'Not Similarity';
+  }
+
+  // Fixed space for variables
+  var formattedResults = `Your Title is similer to ${filteredSimilarities.length}\n`;
+   formattedResults += `-----------------------------------------------------------------\n`;
+var header = arabic ? "Similarity Percentage| Title                                   " : "Title                                   | Similarity Percentage";
+formattedResults += `${header}\n`;
+formattedResults += `-----------------------------------------------------------------\n`;
+
+filteredSimilarities.forEach(function (item) {
+    var similarityPadding = arabic ? "  " : "   ";
+    var titlePadding = arabic ? "   " : "";
+    formattedResults += `${item.similarity}${similarityPadding}|${titlePadding}${item.title}  %\n`;
+    formattedResults += `-----------------------------------------------------------------\n`;
+});
+
+  return formattedResults;
+}
+
+
+
+function calculateSimilarity(textA, textB) {
+  if (textA === textB) {
+    return 100; // Perfect match
+  } else {
+    return 0; // No match
+  }
+}
+
+function simi(str1, str2, LevenshteinDistance) {
+    // Compares two strings for similarity.
+    // Returns a value between 0 and 1 representing the percentage of similarity.
+
+    // Split the input strings into arrays of words
+    let words1 = str1.split(" ");
+    let words2 = str2.split(" ");
+
+    // Initialize counters
+    let commonWords = 0;
+    let totalWords = words2.length;
+
+    // Compare each word in words2 with words1
+    for (let i = 0; i < words2.length; i++) {
+        for (let j = 0; j < words1.length; j++) {
+            if (Wsimi(words2[i].toUpperCase(), words1[j].toUpperCase(), LevenshteinDistance)) {
+                commonWords++;
+                break; // Exit the inner loop when a match is found
+            }
+        }
+    }
+
+   
+    // Calculate the percentage of similarity
+    return totalWords > 0 ? commonWords / totalWords * 100 : 0;
+}
+
+function Wsimi(w1, w2, lev) {
+    if (w1.toUpperCase() === w2.toUpperCase()) {
+        return true;  // Words are exactly equal
+    } else if (lev) {
+        // Calculate Levenshtein distance
+        return LevenshteinDistance(w1, w2) <= 2;
+    }
+    return false;
+}
+
+function LevenshteinDistance(s1, s2) {
+    // Calculates the Levenshtein distance between two strings
+
+    let len1 = s1.length;
+    let len2 = s2.length;
+    let d = new Array(len1 + 1);
+
+    for (let i = 0; i <= len1; i++) {
+        d[i] = new Array(len2 + 1);
+        d[i][0] = i;
+    }
+
+    for (let j = 0; j <= len2; j++) {
+        d[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            let cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+
+            d[i][j] = Math.min(
+                d[i - 1][j] + 1,
+                d[i][j - 1] + 1,
+                d[i - 1][j - 1] + cost
+            );
+        }
+    }
+
+    return d[len1][len2];
+}
