@@ -1,0 +1,80 @@
+
+
+
+
+'Marco to devide arange
+
+Public Sub DivideArabicEnglishColumns(inputRange As Range)
+    Dim arabicColumn As Range
+    Dim englishColumn As Range
+    Dim cell As Range
+    Dim resultsSheet As Worksheet
+    Dim lastRow As Long
+    
+    ' Specify the sheet to which results will be appended
+    Set resultsSheet = Worksheets("All_Titles") ' Change to your actual sheet name
+    
+    ' Find the last row in columns A and B of the results sheet
+    lastRow = Application.WorksheetFunction.Max(resultsSheet.Cells(Rows.Count, 1).End(xlUp).Row, resultsSheet.Cells(Rows.Count, 2).End(xlUp).Row)
+    
+    ' Create new columns for Arabic and English
+    Set arabicColumn = resultsSheet.Range("A" & lastRow + 1)
+    Set englishColumn = resultsSheet.Range("B" & lastRow + 1)
+    
+    ' Loop through each cell in the input range
+    For Each cell In inputRange
+        ' Check if the cell is not blank
+        If Not IsEmpty(cell.Value) And Len(Trim(cell.Value)) > 2 Then
+            ' Determine if the text is Arabic or English based on character range
+            If IsArabicText(cell.Value) Then
+                arabicColumn.Value = Trim(cell.Value)
+                Set arabicColumn = arabicColumn.Offset(1, 0)
+            Else
+                englishColumn.Value = Trim(cell.Value)
+                If Trim(cell.Value) = "Enhancement Security Management for Service Oriented Architecture" Then
+                englishColumn.Value = Trim(cell.Value)
+                
+                End If
+                Set englishColumn = englishColumn.Offset(1, 0)
+            End If
+        End If
+    Next cell
+
+End Sub
+
+Function IsArabicText(text As String) As Boolean
+    ' Check if the text contains Arabic characters based on Unicode range
+    Dim char As String
+    Dim charCode As Long
+    
+    IsArabicText = False
+    
+    For i = 1 To Len(text)
+        char = Mid(text, i, 1)
+        charCode = AscW(char)
+        
+        ' Check if the character falls within the Arabic Unicode range
+        If charCode >= &H600 And charCode <= &H6FF Then
+            IsArabicText = True
+            Exit Function
+        End If
+    Next i
+End Function
+
+Public Sub TestDivideArabicEnglishColumns()
+    ' Prompt the user for input range
+    Dim inputRange As Range
+    On Error Resume Next
+    Set inputRange = Application.InputBox("Select a range:", Type:=8)
+    On Error GoTo 0
+    
+    
+    ' Check if the input range is not canceled
+    If Not inputRange Is Nothing Then
+        ' Call the macro to divide the range into Arabic and English columns
+        DivideArabicEnglishColumns inputRange
+    Else
+        MsgBox "Operation canceled.", vbInformation
+    End If
+End Sub
+
